@@ -1,16 +1,14 @@
-// #![allow(dead_code)]
-// #![allow(unused_imports)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
 #[macro_use]
 extern crate ndarray;
 use ndarray::prelude::*;
 
-
 // local modules
-pub mod geometry;
 pub mod base;
+pub mod contact_search;
 pub mod dem;
-
-
+pub mod geometry;
 
 /// An entity in rudem. It's props are basic and every other particle entity
 /// must have to have these attributes for neighbour search dumping output and
@@ -18,23 +16,23 @@ pub mod dem;
 /// trait `Base` for the basic library functionalities
 
 pub struct DemDiscrete {
-    pub  len: usize,
-    pub  m: Array1<f32>,
-    pub   x: Array1<f32>,
-    pub   y: Array1<f32>,
-    pub   u: Array1<f32>,
-    pub   v: Array1<f32>,
-    pub   omega: Array1<f32>,
-    pub   inertia: Array1<f32>,
-    pub   h: Array1<f32>,
-    pub   m_inv: Array1<f32>,
-    pub   rad: Array1<f32>,
-    pub   fx: Array1<f32>,
-    pub   fy: Array1<f32>,
-    pub   id: usize
+    pub len: usize,
+    pub m: Array1<f32>,
+    pub x: Array1<f32>,
+    pub y: Array1<f32>,
+    pub u: Array1<f32>,
+    pub v: Array1<f32>,
+    pub omega: Array1<f32>,
+    pub inertia: Array1<f32>,
+    pub h: Array1<f32>,
+    pub m_inv: Array1<f32>,
+    pub rad: Array1<f32>,
+    pub fx: Array1<f32>,
+    pub fy: Array1<f32>,
+    pub id: usize,
 }
 
-impl DemDiscrete{
+impl DemDiscrete {
     pub fn new(len: usize, id: usize) -> Self {
         DemDiscrete {
             len,

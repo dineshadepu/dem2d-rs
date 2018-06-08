@@ -1,13 +1,14 @@
-extern crate rudem;
+#![allow(dead_code)]
+#![allow(unused_imports)]
+
 extern crate ndarray;
+extern crate rudem;
 
 use ndarray::prelude::*;
-use rudem::{DemDiscrete};
+use rudem::DemDiscrete;
+use rudem::contact_search::LinkedListGrid;
+use rudem::dem::{body_force_dem, spring_force};
 use rudem::geometry::dam_break_2d_geometry;
-use rudem::dem::body_force;
-
-use std::fs;
-
 
 pub struct SimulationData {
     pub grains_spacing: f32,
@@ -33,7 +34,13 @@ impl SimulationData {
     }
 }
 
-fn main(){
+fn setup_particle_properties(part1: &mut DemDiscrete, h: f32){
+    for i in 0..part1.len {
+        part1.h[i] = h;
+    }
+}
+
+fn main() {
     let sim_data = SimulationData::new();
 
     let (xg, yg, xt, yt) = dam_break_2d_geometry(
@@ -46,19 +53,21 @@ fn main(){
         sim_data.tank_layers,
     );
 
-    let grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0);
-    let tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1);
+    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0);
+    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1);
+    setup_particle_properties(&mut grains, sim_data.grains_spacing);
+    setup_particle_properties(&mut tank, sim_data.tank_spacing);
 
     let dt = 1e-3;
-    let t = 100.*dt;
+    let tf = 1. * dt;
+    let mut t = 0.;
+    let scale = 1.;
 
-    let result = fs::create_dir("./data");
-
-    let mut file_number = 0;
-    // fs::create_dir_all("/data")?;
     while t < tf {
-        body_force(&mut grains);
+        let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], scale);
+        body_force_dem(&mut grains, 0., -9.81);
+        spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
         t = t + dt;
+        println!("{:?}", t);
     }
-
 }
