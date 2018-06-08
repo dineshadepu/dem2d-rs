@@ -6,7 +6,10 @@ use ndarray::prelude::*;
 
 
 // local modules
+pub mod geometry;
 pub mod base;
+pub mod dem;
+
 
 
 /// An entity in rudem. It's props are basic and every other particle entity
@@ -15,6 +18,7 @@ pub mod base;
 /// trait `Base` for the basic library functionalities
 
 pub struct DemDiscrete {
+    pub  len: usize,
     pub  m: Array1<f32>,
     pub   x: Array1<f32>,
     pub   y: Array1<f32>,
@@ -33,6 +37,7 @@ pub struct DemDiscrete {
 impl DemDiscrete{
     pub fn new(len: usize, id: usize) -> Self {
         DemDiscrete {
+            len,
             m: Array1::zeros(len),
             x: Array1::zeros(len),
             y: Array1::zeros(len),
@@ -51,6 +56,7 @@ impl DemDiscrete{
     pub fn new_x(x: Array1<f32>, id: usize) -> Self {
         let len = x.len();
         DemDiscrete {
+            len,
             x,
             id,
             m: Array1::zeros(len),
@@ -69,6 +75,7 @@ impl DemDiscrete{
     pub fn new_x_y(x: Array1<f32>, y: Array1<f32>, id: usize) -> Self {
         let len = x.len();
         DemDiscrete {
+            len,
             x,
             y,
             id,

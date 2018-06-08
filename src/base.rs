@@ -3,6 +3,7 @@ use ndarray::{Array1};
 
 
 pub trait Base {
+    fn get_len(&self) -> &usize;
     fn get_m(&self) -> &Array1<f32>;
     fn get_x(&self) -> &Array1<f32>;
     fn get_y(&self) -> &Array1<f32>;
@@ -16,6 +17,7 @@ pub trait Base {
     fn get_fx(&self) -> &Array1<f32>;
     fn get_fy(&self) -> &Array1<f32>;
     fn get_id(&self) -> &usize;
+    fn get_mut_len(&mut self) -> &mut usize;
     fn get_mut_m(&mut self) -> &mut Array1<f32>;
     fn get_mut_x(&mut self) -> &mut Array1<f32>;
     fn get_mut_y(&mut self) -> &mut Array1<f32>;
@@ -31,6 +33,9 @@ pub trait Base {
 }
 
 impl Base for DemDiscrete{
+    fn get_len(&self) -> &usize{
+        & self.len
+    }
     fn get_m(&self) -> &Array1<f32>{
         & self.m
     }
@@ -69,6 +74,9 @@ impl Base for DemDiscrete{
     }
     fn get_id(&self) -> &usize{
         & self.id
+    }
+    fn get_mut_len(&mut self) -> &mut usize{
+        & mut self.len
     }
     fn get_mut_m(&mut self) -> &mut Array1<f32>{
         &mut self.m
