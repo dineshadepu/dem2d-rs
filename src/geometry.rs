@@ -63,7 +63,7 @@ pub fn dam_break_2d_geometry(
     yf.iter_mut()
         .for_each(|y| *y = *y + (2. * layers as f32) * f_s);
 
-    let (mut xtmp, mut ytmp) = grid_2d(t_l, t_h, t_s);
+    let (xtmp, ytmp) = grid_2d(t_l, t_h, t_s);
 
     // remove layers of the tank
     let x = arange(0., t_l, t_s);

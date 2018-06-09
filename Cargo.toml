@@ -1,11 +1,16 @@
 [package]
-name = "rudem"
+name = "dem-rs"
 version = "0.1.0"
 authors = ["dineshadepu <adepu.dinesh.a@gmail.com>"]
+license = "MIT"
+description = "Discrete element method"
+repository = "https://gitlab.com/dineshadepu/dem-rs"
+readme = "Readme.md"
+keywords = ["dem","sph","fluid simulation"]
 
 [dependencies]
 ndarray="0.11.0"
 
 [lib]
-name = "rudem"
-test = true
+name = "dem"
+path = "src/lib.rs"

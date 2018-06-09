@@ -1,8 +1,8 @@
 extern crate ndarray;
-extern crate rudem;
+extern crate dem;
 
 use ndarray::prelude::*;
-use rudem::{DemDiscrete, base::{Base, BasePartsMut}};
+use dem::{DemDiscrete, base::{Base}};
 
 #[test]
 fn create_a_new_demdiscrete_from_len_and_id() {

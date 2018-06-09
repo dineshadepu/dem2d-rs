@@ -89,4 +89,24 @@ impl DemDiscrete {
             fy: Array1::zeros(len),
         }
     }
+
+    pub fn new_x_y_h(x: Array1<f32>, y: Array1<f32>, h: Array1<f32>, id: usize) -> Self {
+        let len = x.len();
+        DemDiscrete {
+            len,
+            x,
+            y,
+            id,
+            m: Array1::zeros(len),
+            u: Array1::zeros(len),
+            v: Array1::zeros(len),
+            omega: Array1::zeros(len),
+            inertia: Array1::zeros(len),
+            h,
+            m_inv: Array1::zeros(len),
+            rad: Array1::zeros(len),
+            fx: Array1::zeros(len),
+            fy: Array1::zeros(len),
+        }
+    }
 }

@@ -1,5 +1,5 @@
 use super::DemDiscrete;
-use base::{Base, BasePartsMut};
+use base::{Base};
 use contact_search::{LinkedListGrid, get_neighbours_ll};
 
 pub fn body_force_dem<T: Base>(entity: &mut T, gx: f32, gy: f32) {

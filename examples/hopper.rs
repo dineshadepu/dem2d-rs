@@ -2,13 +2,13 @@
 #![allow(unused_imports)]
 
 extern crate ndarray;
-extern crate rudem;
+extern crate dem;
 
 use ndarray::prelude::*;
-use rudem::DemDiscrete;
-use rudem::contact_search::LinkedListGrid;
-use rudem::dem::{body_force_dem, spring_force};
-use rudem::geometry::dam_break_2d_geometry;
+use dem::DemDiscrete;
+use dem::contact_search::LinkedListGrid;
+use dem::dem::{body_force_dem, spring_force};
+use dem::geometry::dam_break_2d_geometry;
 
 pub struct SimulationData {
     pub grains_spacing: f32,

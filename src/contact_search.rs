@@ -2,6 +2,8 @@ use std::collections::HashMap;
 use std::collections::LinkedList;
 
 use base::{Base, BasePartsMut};
+use DemDiscrete;
+use arr1;
 
 #[derive(Debug, Clone)]
 pub struct CellGrid {
@@ -113,87 +115,176 @@ impl LinkedListGrid {
     }
 }
 
-pub fn get_neighbours_ll(pos: [f32; 2], grid: &LinkedListGrid, src_id: &usize) {
+pub fn get_neighbours_ll(pos: [f32; 2], grid: &LinkedListGrid, src_id: &usize) -> LinkedList<usize> {
     let cells = &grid.cells;
     let cells_len = cells.len();
 
     let x_index = ((pos[0] - grid.x_min) / grid.size) as usize;
     let y_index = ((pos[1] - grid.y_min) / grid.size) as usize;
-    println!("{:?}", x_index);
 
     // index in grid
     let index = x_index * grid.no_y_cells + y_index;
+    println!("{:?}", index);
 
     let mut neighbours_particle: LinkedList<usize> = LinkedList::new();
 
     if index >= 0 {
+        println!("indside index {}", index);
         for val in &cells[index].indices[src_id] {
+            println!("indside index values {}", val);
             neighbours_particle.push_front(*val);
         }
     }
     if let Some(j) = index.checked_sub(1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells - 1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells + 1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
 
     if let Some(j) = index.checked_add(grid.no_y_cells) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(grid.no_y_cells - 1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(grid.no_y_cells + 1) {
+        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
+                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
+        }
+    }
+    neighbours_particle
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn create_nine_particles() -> DemDiscrete {
+        let x = vec![0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3];
+        let y = vec![0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3];
+        let h = vec![0.05; x.len()];
+
+        let mut entity = DemDiscrete::new_x_y_h(arr1(&x), arr1(&y), arr1(&h), 0);
+        entity
+    }
+
+    // #[test]
+    fn test_grid_attributes_nine_particles() {
+        let mut entity = create_nine_particles();
+        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
+
+        assert!(grid.x_min - 0.09 < 1e-8);
+        assert!(grid.x_max - 0.31 < 1e-8);
+        assert_eq!(grid.no_x_cells, 3);
+        assert_eq!(grid.no_y_cells, 3);
+
+        // check if first particle is in correct cell
+        assert_eq!(grid.cells[0].indices[&0].front(), Some(&0));
+        assert_eq!(grid.cells[1].indices[&0].front(), Some(&3));
+        assert_eq!(grid.cells[2].indices[&0].front(), Some(&6));
+        assert_eq!(grid.cells[3].indices[&0].front(), Some(&1));
+        assert_eq!(grid.cells[4].indices[&0].front(), Some(&4));
+        assert_eq!(grid.cells[5].indices[&0].front(), Some(&7));
+        assert_eq!(grid.cells[6].indices[&0].front(), Some(&2));
+        assert_eq!(grid.cells[7].indices[&0].front(), Some(&5));
+        assert_eq!(grid.cells[8].indices[&0].front(), Some(&8));
+    }
+    #[test]
+    fn test_neighbours_nine_particles() {
+        let mut entity = create_nine_particles();
+        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
+
+        // the zero'th particles neighbours are [4, 3, 1, 0]
+        let zero_nbrs = get_neighbours_ll([entity.x[0], entity.y[0]], &grid, &0);
+        let expected = vec![4, 3, 1, 0, 6];
+        // check total neighbours length
+        assert_eq!(expected.len(), zero_nbrs.len());
+        // check each neighbour index
+        for i in expected {
+            assert_eq!(zero_nbrs.contains(&i), true);
+        }
+
+        // the 4'th particles neighbours are [8, 2, 5, 0, 6, 3, 7, 1, 4]
+        let fourth_nbrs = get_neighbours_ll([entity.x[4], entity.y[4]], &grid, &0);
+        let expected = vec![8, 2, 5, 0, 6, 3, 7, 1, 4];
+        // check total neighbours length
+        assert_eq!(expected.len(), fourth_nbrs.len());
+        // check each neighbour index
+        for i in expected {
+            assert_eq!(fourth_nbrs.contains(&i), true);
+        }
+        // the 2'th particles neighbours are [8, 2, 5, 0, 6, 3, 7, 1, 4]
+        let second_nbrs = get_neighbours_ll([entity.x[2], entity.y[2]], &grid, &0);
+        let expected = vec![2, 5, 7, 1, 6, 4, 8];
+        // check total neighbours length
+        assert_eq!(expected.len(), second_nbrs.len());
+        // check each neighbour index
+        for i in expected {
+            assert_eq!(second_nbrs.contains(&i), true);
         }
     }
 }
