@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 use std::collections::LinkedList;
 
-use base::{Base, BasePartsMut};
 use DemDiscrete;
 use arr1;
+use base::{Base, BasePartsMut};
 
 #[derive(Debug, Clone)]
 pub struct CellGrid {
@@ -115,7 +115,11 @@ impl LinkedListGrid {
     }
 }
 
-pub fn get_neighbours_ll(pos: [f32; 2], grid: &LinkedListGrid, src_id: &usize) -> LinkedList<usize> {
+pub fn get_neighbours_ll(
+    pos: [f32; 2],
+    grid: &LinkedListGrid,
+    src_id: &usize,
+) -> LinkedList<usize> {
     let cells = &grid.cells;
     let cells_len = cells.len();
 
@@ -124,94 +128,75 @@ pub fn get_neighbours_ll(pos: [f32; 2], grid: &LinkedListGrid, src_id: &usize) -
 
     // index in grid
     let index = x_index * grid.no_y_cells + y_index;
-    println!("{:?}", index);
 
     let mut neighbours_particle: LinkedList<usize> = LinkedList::new();
 
     if index >= 0 {
-        println!("indside index {}", index);
         for val in &cells[index].indices[src_id] {
-            println!("indside index values {}", val);
             neighbours_particle.push_front(*val);
         }
     }
     if let Some(j) = index.checked_sub(1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells - 1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_sub(grid.no_y_cells + 1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
 
     if let Some(j) = index.checked_add(grid.no_y_cells) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(grid.no_y_cells - 1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
     }
     if let Some(j) = index.checked_add(grid.no_y_cells + 1) {
-        println!("indside index {}", j);
         // make sure that the index is in limits of cell
         if j <= cells_len - 1 {
             for val in &cells[j].indices[src_id] {
-                println!("indside index values {}", val);
                 neighbours_particle.push_front(*val);
             }
         }
@@ -228,7 +213,7 @@ mod tests {
         let y = vec![0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3];
         let h = vec![0.05; x.len()];
 
-        let mut entity = DemDiscrete::new_x_y_h(arr1(&x), arr1(&y), arr1(&h), 0);
+        let entity = DemDiscrete::new_x_y_h(arr1(&x), arr1(&y), arr1(&h), 0);
         entity
     }
 

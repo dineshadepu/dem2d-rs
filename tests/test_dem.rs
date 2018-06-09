@@ -1,8 +1,8 @@
-extern crate ndarray;
 extern crate dem;
+extern crate ndarray;
 
+use dem::{DemDiscrete, base::Base};
 use ndarray::prelude::*;
-use dem::{DemDiscrete, base::{Base}};
 
 #[test]
 fn create_a_new_demdiscrete_from_len_and_id() {

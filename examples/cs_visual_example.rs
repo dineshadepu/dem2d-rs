@@ -5,8 +5,7 @@ extern crate dem;
 extern crate ndarray;
 
 use dem::DemDiscrete;
-use dem::contact_search::LinkedListGrid;
-use dem::dem::{make_forces_zero, body_force_dem, spring_force};
+use dem::contact_search::{get_neighbours_ll, LinkedListGrid};
 use dem::geometry::dam_break_2d_geometry;
 use ndarray::prelude::*;
 
@@ -59,17 +58,10 @@ fn main() {
     setup_particle_properties(&mut grains, sim_data.grains_spacing);
     setup_particle_properties(&mut tank, sim_data.tank_spacing);
 
-    let dt = 1e-3;
-    let tf = 1. * dt;
-    let mut t = 0.;
-    let scale = 1.;
-
-    while t < tf {
-        let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], scale);
-        make_forces_zero(&mut grains);
-        body_force_dem(&mut grains, 0., -9.81);
-        spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
-        t = t + dt;
-        println!("{:?}", t);
+    let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], 1.);
+    let neighbours_particle_400 = get_neighbours_ll([grains.x[400], grains.y[400]], &grid, &0);
+    println!("{:?} {:?}", grains.x[400], grains.y[400]);
+    for i in neighbours_particle_400 {
+        println!("{:?} {:?}", grains.x[i], grains.y[i]);
     }
 }
