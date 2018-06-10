@@ -6,9 +6,10 @@ extern crate ndarray;
 
 use dem::DemDiscrete;
 use dem::contact_search::LinkedListGrid;
-use dem::dem::{make_forces_zero, body_force_dem, spring_force};
+use dem::dem::{body_force_dem, make_forces_zero, spring_force};
 use dem::geometry::dam_break_2d_geometry;
 use dem::integrator::integrate;
+use dem::save_data::create_output_directory;
 use ndarray::prelude::*;
 
 pub struct SimulationData {
@@ -60,13 +61,24 @@ fn main() {
 
     let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0);
     let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1);
-    setup_particle_properties(&mut grains, sim_data.grains_spacing, 1000. * sim_data.grains_spacing.powf(2.));
-    setup_particle_properties(&mut tank, sim_data.tank_spacing, 1000. * sim_data.tank_spacing.powf(2.));
+    setup_particle_properties(
+        &mut grains,
+        sim_data.grains_spacing,
+        1000. * sim_data.grains_spacing.powf(2.),
+    );
+    setup_particle_properties(
+        &mut tank,
+        sim_data.tank_spacing,
+        1000. * sim_data.tank_spacing.powf(2.),
+    );
 
     let dt = 1e-4;
     let tf = 1000. * dt;
     let mut t = 0.;
     let scale = 2.;
+
+
+    create_output_directory();
 
     while t < tf {
         let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], scale);
@@ -75,10 +87,5 @@ fn main() {
         spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
         integrate(&mut grains, dt);
         t = t + dt;
-        // println!("{:?}", t);
-    }
-
-    for i in 0..grains.x.len(){
-        println!("{:?} {:?}", grains.x[i], grains.y[i]);
     }
 }

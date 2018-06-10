@@ -10,6 +10,7 @@ pub mod contact_search;
 pub mod dem;
 pub mod geometry;
 pub mod integrator;
+pub mod save_data;
 
 /// An entity in rudem. It's props are basic and every other particle entity
 /// must have to have these attributes for neighbour search dumping output and

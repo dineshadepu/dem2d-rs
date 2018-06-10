@@ -222,7 +222,6 @@ mod tests {
     fn create_ine_particles(){
         let mut entity = create_nine_particles();
         let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
-        println!("{:?}", grid);
     }
     // #[test]
     fn test_grid_attributes_nine_particles() {
