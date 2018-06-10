@@ -59,8 +59,8 @@ fn main() {
     setup_particle_properties(&mut grains, sim_data.grains_spacing);
     setup_particle_properties(&mut tank, sim_data.tank_spacing);
 
-    let dt = 1e-3;
-    let tf = 1. * dt;
+    let dt = 1e-4;
+    let tf = 100. * dt;
     let mut t = 0.;
     let scale = 1.;
 
@@ -71,5 +71,9 @@ fn main() {
         spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
         t = t + dt;
         println!("{:?}", t);
+    }
+
+    for i in 0..grains.x.len(){
+        println!("{:?} {:?}", grains.x[i], grains.y[i]);
     }
 }

@@ -61,8 +61,8 @@ impl LinkedListGrid {
                 if y_max < ent_i.y[i] {
                     y_max = ent_i.y[i];
                 }
-                if size < 2. * ent_i.h[i] {
-                    size = 2. * ent_i.h[i];
+                if size < ent_i.h[i] {
+                    size = ent_i.h[i];
                 }
             }
         }
@@ -208,6 +208,7 @@ pub fn get_neighbours_ll(
 mod tests {
     use super::*;
 
+    // #[test]
     fn create_nine_particles() -> DemDiscrete {
         let x = vec![0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3];
         let y = vec![0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3];
@@ -217,6 +218,12 @@ mod tests {
         entity
     }
 
+    #[test]
+    fn create_ine_particles(){
+        let mut entity = create_nine_particles();
+        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
+        println!("{:?}", grid);
+    }
     // #[test]
     fn test_grid_attributes_nine_particles() {
         let mut entity = create_nine_particles();
@@ -238,7 +245,7 @@ mod tests {
         assert_eq!(grid.cells[7].indices[&0].front(), Some(&5));
         assert_eq!(grid.cells[8].indices[&0].front(), Some(&8));
     }
-    #[test]
+    // #[test]
     fn test_neighbours_nine_particles() {
         let mut entity = create_nine_particles();
         let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
