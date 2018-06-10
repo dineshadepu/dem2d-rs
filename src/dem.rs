@@ -68,18 +68,16 @@ pub fn spring_force<T: Base>(
             for i in 0..*dst.len {
                 let nbrs = get_neighbours_ll([dst.x[i], dst.y[i]], &grid, &src_id);
                 for j in nbrs {
-                    if i != j {
-                        let dx = dst.x[i] - src.x[j];
-                        let dy = dst.y[i] - src.y[j];
-                        let dist = (dx.powf(2.) + dy.powf(2.)).powf(0.5);
-                        let overlap = dst.rad[i] + src.rad[j] - dist;
+                    let dx = dst.x[i] - src.x[j];
+                    let dy = dst.y[i] - src.y[j];
+                    let dist = (dx.powf(2.) + dy.powf(2.)).powf(0.5);
+                    let overlap = dst.rad[i] + src.rad[j] - dist;
 
-                        if overlap > 0. {
-                            let nx = dx / overlap;
-                            let ny = dx / overlap;
-                            dst.fx[i] += kn * overlap * nx;
-                            dst.fy[i] += kn * overlap * ny;
-                        }
+                    if overlap > 0. {
+                        let nx = dx / overlap;
+                        let ny = dx / overlap;
+                        dst.fx[i] += kn * overlap * nx;
+                        dst.fy[i] += kn * overlap * ny;
                     }
                 }
             }

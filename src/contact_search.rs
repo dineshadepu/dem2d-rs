@@ -41,7 +41,6 @@ impl LinkedListGrid {
         let mut x_max = world[0].get_x()[0];
         let mut y_min = world[0].get_y()[0];
         let mut y_max = world[0].get_y()[0];
-
         // find particle with maximum size to set
         // the size of the grid cell
         let mut size = 0.;
@@ -74,6 +73,7 @@ impl LinkedListGrid {
         x_max = x_max + size / 10.;
         y_min = y_min - size / 10.;
         y_max = y_max + size / 10.;
+
         // number of cells in x direction and y direction
         let no_x_cells = ((x_max - x_min) / size) as usize + 1;
         let no_y_cells = ((y_max - y_min) / size) as usize + 1;
@@ -86,7 +86,7 @@ impl LinkedListGrid {
         }
 
         // create cells of required size
-        let mut cells: Vec<CellGrid> = vec![CellGrid::new(&keys); no_x_cells * no_x_cells];
+        let mut cells: Vec<CellGrid> = vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
 
         for j in 0..world.len() {
             let entity = world[j].get_parts_mut();
