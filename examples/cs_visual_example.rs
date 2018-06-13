@@ -60,8 +60,4 @@ fn main() {
 
     let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], 1.);
     let neighbours_particle_400 = get_neighbours_ll([grains.x[400], grains.y[400]], &grid, &0);
-    println!("{:?} {:?}", grains.x[400], grains.y[400]);
-    for i in neighbours_particle_400 {
-        println!("{:?} {:?}", grains.x[i], grains.y[i]);
-    }
 }

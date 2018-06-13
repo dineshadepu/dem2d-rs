@@ -65,7 +65,7 @@ fn main() {
         let grid = LinkedListGrid::new(&mut vec![&mut free, &mut boundary], scale);
         make_forces_zero(&mut free);
         body_force_dem(&mut free, 0., -9.81);
-        spring_force(&mut vec![&mut free, &mut boundary], 0, vec![1], 1e4, grid);
+        spring_force(&mut vec![&mut free, &mut boundary], 0, vec![1], 1e4, &grid);
         integrate(&mut free, dt);
         t = t + dt;
         // println!("{:?}", t);

@@ -85,7 +85,7 @@ fn main() {
         let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], scale);
         make_forces_zero(&mut grains);
         body_force_dem(&mut grains, 0., -9.81);
-        spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
+        spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, &grid);
         integrate(&mut grains, dt);
         t = t + dt;
         if time_step_number % 100 == 0{

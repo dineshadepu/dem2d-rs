@@ -39,13 +39,13 @@ pub fn spring_force<T: Base>(
     dst_id: usize,
     srcs: Vec<usize>,
     kn: f32,
-    grid: LinkedListGrid,
+    grid: &LinkedListGrid,
 ) {
     for src_id in srcs {
         if dst_id == src_id {
             let dst = entities[dst_id].get_parts_mut();
             for i in 0..*dst.len {
-                let nbrs = get_neighbours_ll([dst.x[i], dst.y[i]], &grid, &src_id);
+                let nbrs = get_neighbours_ll([dst.x[i], dst.y[i]], &grid, &dst.id);
                 for j in nbrs {
                     if i != j {
                         let dx = dst.x[i] - dst.x[j];
@@ -67,13 +67,12 @@ pub fn spring_force<T: Base>(
             let dst = dst_main.get_parts_mut();
             let src = src_main.get_parts_mut();
             for i in 0..*dst.len {
-                let nbrs = get_neighbours_ll([dst.x[i], dst.y[i]], &grid, &src_id);
+                let nbrs = get_neighbours_ll([dst.x[i], dst.y[i]], &grid, &src.id);
                 for j in nbrs {
                     let dx = dst.x[i] - src.x[j];
                     let dy = dst.y[i] - src.y[j];
                     let dist = (dx.powf(2.) + dy.powf(2.)).powf(0.5);
                     let overlap = dst.rad[i] + src.rad[j] - dist;
-
                     if overlap > 0. {
                         let nx = dx / dist;
                         let ny = dy / dist;

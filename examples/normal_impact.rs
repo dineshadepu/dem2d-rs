@@ -59,7 +59,7 @@ fn main() {
     while t < tf {
         let grid = LinkedListGrid::new(&mut vec![&mut free], scale);
         make_forces_zero(&mut free);
-        spring_force(&mut vec![&mut free], 0, vec![0], 1e4, grid);
+        spring_force(&mut vec![&mut free], 0, vec![0], 1e4, &grid);
         integrate(&mut free, dt);
         t = t + dt;
         println!("{:?}", t);
