@@ -37,7 +37,7 @@ fn main() {
     let sim_data = SimulationData::new();
 
     let xa = array![0.];
-    let ya = array![2.];
+    let ya = array![0.3];
     let xb = array![0.];
     let yb = array![0.];
 
@@ -68,7 +68,6 @@ fn main() {
         spring_force(&mut vec![&mut free, &mut boundary], 0, vec![1], 1e4, &grid);
         integrate(&mut free, dt);
         t = t + dt;
-        // println!("{:?}", t);
         if time_step_number % 100 == 0{
             dump_output(&mut vec![&mut free, &mut boundary], time_step_number);
         }
