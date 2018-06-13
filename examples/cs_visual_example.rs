@@ -53,8 +53,8 @@ fn main() {
         sim_data.tank_layers,
     );
 
-    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0);
-    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1);
+    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0, String::from("grains"));
+    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1, String::from("tank"));
     setup_particle_properties(&mut grains, sim_data.grains_spacing);
     setup_particle_properties(&mut tank, sim_data.tank_spacing);
 

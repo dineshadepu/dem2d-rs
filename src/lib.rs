@@ -32,12 +32,14 @@ pub struct DemDiscrete {
     pub fx: Array1<f32>,
     pub fy: Array1<f32>,
     pub id: usize,
+    pub name: String,
 }
 
 impl DemDiscrete {
-    pub fn new(len: usize, id: usize) -> Self {
+    pub fn new(len: usize, id: usize, name: String) -> Self {
         DemDiscrete {
             len,
+            name,
             m: Array1::zeros(len),
             x: Array1::zeros(len),
             y: Array1::zeros(len),
@@ -53,12 +55,13 @@ impl DemDiscrete {
             id: id,
         }
     }
-    pub fn new_x(x: Array1<f32>, id: usize) -> Self {
+    pub fn new_x(x: Array1<f32>, id: usize, name: String) -> Self {
         let len = x.len();
         DemDiscrete {
             len,
             x,
             id,
+            name,
             m: Array1::zeros(len),
             y: Array1::zeros(len),
             u: Array1::zeros(len),
@@ -72,13 +75,14 @@ impl DemDiscrete {
             fy: Array1::zeros(len),
         }
     }
-    pub fn new_x_y(x: Array1<f32>, y: Array1<f32>, id: usize) -> Self {
+    pub fn new_x_y(x: Array1<f32>, y: Array1<f32>, id: usize, name: String) -> Self {
         let len = x.len();
         DemDiscrete {
             len,
             x,
             y,
             id,
+            name,
             m: Array1::zeros(len),
             u: Array1::zeros(len),
             v: Array1::zeros(len),
@@ -92,13 +96,14 @@ impl DemDiscrete {
         }
     }
 
-    pub fn new_x_y_h(x: Array1<f32>, y: Array1<f32>, h: Array1<f32>, id: usize) -> Self {
+    pub fn new_x_y_h(x: Array1<f32>, y: Array1<f32>, h: Array1<f32>, id: usize, name: String) -> Self {
         let len = x.len();
         DemDiscrete {
             len,
             x,
             y,
             id,
+            name,
             m: Array1::zeros(len),
             u: Array1::zeros(len),
             v: Array1::zeros(len),

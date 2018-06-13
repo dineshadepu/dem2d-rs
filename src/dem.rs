@@ -20,19 +20,20 @@ pub fn body_force_dem<T: Base>(entity: &mut T, gx: f32, gy: f32) {
     }
 }
 
-fn get_mut_elem<T>(data: &mut [T], a: usize, b: usize) -> (&mut T, &mut T) {
-    assert!(a < data.len() && b < data.len() && a != b);
+pub fn get_two_mut<T>(data: &mut [T], a: usize, b: usize) -> (&mut T, &mut T) {
+
+    assert!(a != b);
+
+    let ptr: *mut [T] = data;
+
     unsafe {
-        (
-            &mut *data.as_mut_ptr().offset(a as isize),
-            &mut *data.as_mut_ptr().offset(b as isize),
-        )
+
+        (&mut (*ptr)[a], &mut (*ptr)[b])
+
     }
+
 }
 
-pub fn get_two_mut<T>(data: &mut Vec<T>, a: usize, b: usize) -> (&mut T, &mut T) {
-    get_mut_elem(data, a, b)
-}
 pub fn spring_force<T: Base>(
     mut entities: &mut Vec<&mut T>,
     dst_id: usize,
@@ -53,8 +54,8 @@ pub fn spring_force<T: Base>(
                         let overlap = dst.rad[i] + dst.rad[j] - dist;
 
                         if overlap > 0. {
-                            let nx = dx / overlap;
-                            let ny = dx / overlap;
+                            let nx = dx / dist;
+                            let ny = dy / dist;
                             dst.fx[i] += kn * overlap * nx;
                             dst.fy[i] += kn * overlap * ny;
                         }
@@ -62,7 +63,7 @@ pub fn spring_force<T: Base>(
                 }
             }
         } else {
-            let (dst_main, src_main) = get_mut_elem(&mut entities, dst_id, src_id);
+            let (dst_main, src_main) = get_two_mut(&mut entities, dst_id, src_id);
             let dst = dst_main.get_parts_mut();
             let src = src_main.get_parts_mut();
             for i in 0..*dst.len {
@@ -74,8 +75,8 @@ pub fn spring_force<T: Base>(
                     let overlap = dst.rad[i] + src.rad[j] - dist;
 
                     if overlap > 0. {
-                        let nx = dx / overlap;
-                        let ny = dx / overlap;
+                        let nx = dx / dist;
+                        let ny = dy / dist;
                         dst.fx[i] += kn * overlap * nx;
                         dst.fy[i] += kn * overlap * ny;
                     }

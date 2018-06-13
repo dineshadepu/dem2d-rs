@@ -9,7 +9,7 @@ use dem::contact_search::LinkedListGrid;
 use dem::dem::{body_force_dem, make_forces_zero, spring_force};
 use dem::geometry::dam_break_2d_geometry;
 use dem::integrator::integrate;
-use dem::save_data::create_output_directory;
+use dem::save_data::{create_output_directory, dump_output};
 use ndarray::prelude::*;
 
 pub struct SimulationData {
@@ -59,21 +59,22 @@ fn main() {
         sim_data.tank_layers,
     );
 
-    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0);
-    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1);
+    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0, "grains".to_string());
+    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1, "tank".to_string());
     setup_particle_properties(
         &mut grains,
-        sim_data.grains_spacing,
+        sim_data.grains_spacing/2.,
         1000. * sim_data.grains_spacing.powf(2.),
     );
     setup_particle_properties(
         &mut tank,
-        sim_data.tank_spacing,
+        sim_data.tank_spacing/2.,
         1000. * sim_data.tank_spacing.powf(2.),
     );
 
-    let dt = 1e-4;
-    let tf = 1000. * dt;
+    let dt = 3e-4;
+    let tf = 2.;
+    let mut time_step_number = 0;
     let mut t = 0.;
     let scale = 2.;
 
@@ -87,5 +88,10 @@ fn main() {
         spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e4, grid);
         integrate(&mut grains, dt);
         t = t + dt;
+        if time_step_number % 100 == 0{
+            println!("{:?}", time_step_number);
+            dump_output(&mut vec![&mut grains, &mut tank], time_step_number);
+        }
+        time_step_number += 1;
     }
 }

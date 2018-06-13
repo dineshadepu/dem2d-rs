@@ -75,8 +75,8 @@ impl LinkedListGrid {
         y_max = y_max + size / 10.;
 
         // number of cells in x direction and y direction
-        let no_x_cells = ((x_max - x_min) / size) as usize + 1;
-        let no_y_cells = ((y_max - y_min) / size) as usize + 1;
+        let no_x_cells = ((x_max - x_min) / size) as usize + 2;
+        let no_y_cells = ((y_max - y_min) / size) as usize + 2;
 
         // get all keys of the entities
         let mut keys: Vec<usize> = vec![];
@@ -202,80 +202,4 @@ pub fn get_neighbours_ll(
         }
     }
     neighbours_particle
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // #[test]
-    fn create_nine_particles() -> DemDiscrete {
-        let x = vec![0.1, 0.2, 0.3, 0.1, 0.2, 0.3, 0.1, 0.2, 0.3];
-        let y = vec![0.1, 0.1, 0.1, 0.2, 0.2, 0.2, 0.3, 0.3, 0.3];
-        let h = vec![0.05; x.len()];
-
-        let entity = DemDiscrete::new_x_y_h(arr1(&x), arr1(&y), arr1(&h), 0);
-        entity
-    }
-
-    #[test]
-    fn create_ine_particles(){
-        let mut entity = create_nine_particles();
-        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
-    }
-    // #[test]
-    fn test_grid_attributes_nine_particles() {
-        let mut entity = create_nine_particles();
-        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
-
-        assert!(grid.x_min - 0.09 < 1e-8);
-        assert!(grid.x_max - 0.31 < 1e-8);
-        assert_eq!(grid.no_x_cells, 3);
-        assert_eq!(grid.no_y_cells, 3);
-
-        // check if first particle is in correct cell
-        assert_eq!(grid.cells[0].indices[&0].front(), Some(&0));
-        assert_eq!(grid.cells[1].indices[&0].front(), Some(&3));
-        assert_eq!(grid.cells[2].indices[&0].front(), Some(&6));
-        assert_eq!(grid.cells[3].indices[&0].front(), Some(&1));
-        assert_eq!(grid.cells[4].indices[&0].front(), Some(&4));
-        assert_eq!(grid.cells[5].indices[&0].front(), Some(&7));
-        assert_eq!(grid.cells[6].indices[&0].front(), Some(&2));
-        assert_eq!(grid.cells[7].indices[&0].front(), Some(&5));
-        assert_eq!(grid.cells[8].indices[&0].front(), Some(&8));
-    }
-    // #[test]
-    fn test_neighbours_nine_particles() {
-        let mut entity = create_nine_particles();
-        let grid = LinkedListGrid::new(&mut vec![&mut entity], 1.0);
-
-        // the zero'th particles neighbours are [4, 3, 1, 0]
-        let zero_nbrs = get_neighbours_ll([entity.x[0], entity.y[0]], &grid, &0);
-        let expected = vec![4, 3, 1, 0, 6];
-        // check total neighbours length
-        assert_eq!(expected.len(), zero_nbrs.len());
-        // check each neighbour index
-        for i in expected {
-            assert_eq!(zero_nbrs.contains(&i), true);
-        }
-
-        // the 4'th particles neighbours are [8, 2, 5, 0, 6, 3, 7, 1, 4]
-        let fourth_nbrs = get_neighbours_ll([entity.x[4], entity.y[4]], &grid, &0);
-        let expected = vec![8, 2, 5, 0, 6, 3, 7, 1, 4];
-        // check total neighbours length
-        assert_eq!(expected.len(), fourth_nbrs.len());
-        // check each neighbour index
-        for i in expected {
-            assert_eq!(fourth_nbrs.contains(&i), true);
-        }
-        // the 2'th particles neighbours are [8, 2, 5, 0, 6, 3, 7, 1, 4]
-        let second_nbrs = get_neighbours_ll([entity.x[2], entity.y[2]], &grid, &0);
-        let expected = vec![2, 5, 7, 1, 6, 4, 8];
-        // check total neighbours length
-        assert_eq!(expected.len(), second_nbrs.len());
-        // check each neighbour index
-        for i in expected {
-            assert_eq!(second_nbrs.contains(&i), true);
-        }
-    }
 }
