@@ -1,13 +1,25 @@
+use ndarray::Array1;
 use std::collections::HashMap;
-use std::collections::LinkedList;
 
-use DemDiscrete;
-use arr1;
-use base::{Base, BasePartsMut};
+pub struct NNPSMutParts<'a> {
+    pub len: &'a mut usize,
+    pub x: &'a mut Array1<f32>,
+    pub y: &'a mut Array1<f32>,
+    pub h: &'a mut Array1<f32>,
+    pub id: &'a mut usize,
+}
+
+// trait which has to be implemented by every struct which need to be
+// implemented linked list neighbour search
+pub trait NNPS {
+    fn get_parts_mut(&mut self) -> NNPSMutParts;
+    fn get_x(&self) -> &Array1<f32>;
+    fn get_y(&self) -> &Array1<f32>;
+}
 
 #[derive(Debug, Clone)]
 pub struct CellGrid {
-    pub indices: HashMap<usize, LinkedList<usize>>,
+    pub indices: HashMap<usize, Vec<usize>>,
 }
 
 impl CellGrid {
@@ -16,7 +28,7 @@ impl CellGrid {
             indices: HashMap::new(),
         };
         for key in keys {
-            cell.indices.insert(*key, LinkedList::new());
+            cell.indices.insert(*key, Vec::new());
         }
         cell
     }
@@ -35,7 +47,7 @@ pub struct LinkedListGrid {
 }
 
 impl LinkedListGrid {
-    pub fn new<T: Base>(world: &mut Vec<&mut T>, scale: f32) -> LinkedListGrid {
+    pub fn new<T: NNPS>(world: &mut Vec<&mut T>, scale: f32) -> LinkedListGrid {
         // compute the limits of the grid
         let mut x_min = world[0].get_x()[0];
         let mut x_max = world[0].get_x()[0];
@@ -86,7 +98,8 @@ impl LinkedListGrid {
         }
 
         // create cells of required size
-        let mut cells: Vec<CellGrid> = vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
+        let mut cells: Vec<CellGrid> =
+            vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
 
         for j in 0..world.len() {
             let entity = world[j].get_parts_mut();
@@ -97,7 +110,7 @@ impl LinkedListGrid {
                 let y_index = ((entity.y[i] - y_min) / size) as usize;
                 // one dimentional index is
                 let index = x_index * no_y_cells + y_index;
-                cells[index].indices.get_mut(&id).unwrap().push_back(i);
+                cells[index].indices.get_mut(&id).unwrap().push(i);
             }
         }
         let grid = LinkedListGrid {
@@ -115,13 +128,13 @@ impl LinkedListGrid {
     }
 }
 
-pub fn get_neighbours_ll(
-    pos: [f32; 2],
-    grid: &LinkedListGrid,
+
+pub fn get_neighbours_ll<'a>(
+    pos: [f32; 3],
+    grid: &'a LinkedListGrid,
     src_id: &usize,
-) -> LinkedList<usize> {
+) -> Vec<&'a Vec<usize>> {
     let cells = &grid.cells;
-    let cells_len = cells.len();
 
     let x_index = ((pos[0] - grid.x_min) / grid.size) as usize;
     let y_index = ((pos[1] - grid.y_min) / grid.size) as usize;
@@ -129,76 +142,22 @@ pub fn get_neighbours_ll(
     // index in grid
     let index = x_index * grid.no_y_cells + y_index;
 
-    let mut neighbours_particle: LinkedList<usize> = LinkedList::new();
+    let mut neighbours_particle: Vec<&Vec<usize>> = Vec::new();
 
-    if index >= 0 {
-        for val in &cells[index].indices[src_id] {
-            neighbours_particle.push_front(*val);
-        }
-    }
-    if let Some(j) = index.checked_sub(1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_add(1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_sub(grid.no_y_cells) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_sub(grid.no_y_cells - 1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_sub(grid.no_y_cells + 1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-
-    if let Some(j) = index.checked_add(grid.no_y_cells) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_add(grid.no_y_cells - 1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
-        }
-    }
-    if let Some(j) = index.checked_add(grid.no_y_cells + 1) {
-        // make sure that the index is in limits of cell
-        if j <= cells_len - 1 {
-            for val in &cells[j].indices[src_id] {
-                neighbours_particle.push_front(*val);
-            }
+    // for the stack of z = 0
+    for neighbour in &[
+        Some(index),
+        index.checked_sub(1),
+        index.checked_add(1),
+        index.checked_sub(grid.no_y_cells),
+        index.checked_sub(grid.no_y_cells - 1),
+        index.checked_sub(grid.no_y_cells + 1),
+        index.checked_add(grid.no_y_cells),
+        index.checked_add(grid.no_y_cells - 1),
+        index.checked_add(grid.no_y_cells + 1),
+    ] {
+        if let Some(cell) = neighbour.and_then(|index| cells.get(index)) {
+            neighbours_particle.push(&cell.indices[src_id])
         }
     }
     neighbours_particle

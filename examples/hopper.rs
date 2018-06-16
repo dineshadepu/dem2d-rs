@@ -72,7 +72,7 @@ fn main() {
         1000. * sim_data.tank_spacing.powf(2.),
     );
 
-    let dt = 3e-4;
+    let dt = 1e-5;
     let tf = 2.;
     let mut time_step_number = 0;
     let mut t = 0.;

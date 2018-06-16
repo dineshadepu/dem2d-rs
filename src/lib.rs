@@ -3,19 +3,17 @@
 #[macro_use]
 extern crate ndarray;
 use ndarray::prelude::*;
+use ndarray::prelude::*;
 
 // local modules
-pub mod base;
 pub mod contact_search;
 pub mod dem;
 pub mod geometry;
 pub mod integrator;
 pub mod save_data;
 
-/// An entity in rudem. It's props are basic and every other particle entity
-/// must have to have these attributes for neighbour search dumping output and
-/// other functionalities.  Each and every type of struct has to implement a
-/// trait `Base` for the basic library functionalities
+use contact_search::{NNPS, NNPSMutParts};
+
 
 pub struct DemDiscrete {
     pub len: usize,
@@ -115,5 +113,24 @@ impl DemDiscrete {
             fx: Array1::zeros(len),
             fy: Array1::zeros(len),
         }
+    }
+}
+
+impl NNPS for DemDiscrete{
+    fn get_parts_mut(&mut self) -> NNPSMutParts {
+        NNPSMutParts {
+            len: &mut self.len,
+            x: &mut self.x,
+            y: &mut self.y,
+            h: &mut self.h,
+            id: &mut self.id,
+        }
+    }
+
+    fn get_x(&self) -> &Array1<f32> {
+        &self.x
+    }
+    fn get_y(&self) -> &Array1<f32> {
+        &self.y
     }
 }
