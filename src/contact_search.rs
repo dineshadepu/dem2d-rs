@@ -1,11 +1,10 @@
-use ndarray::Array1;
 use std::collections::HashMap;
 
 pub struct NNPSMutParts<'a> {
     pub len: &'a mut usize,
-    pub x: &'a mut Array1<f32>,
-    pub y: &'a mut Array1<f32>,
-    pub h: &'a mut Array1<f32>,
+    pub x: &'a mut Vec<f32>,
+    pub y: &'a mut Vec<f32>,
+    pub h: &'a mut Vec<f32>,
     pub id: &'a mut usize,
 }
 
@@ -13,8 +12,31 @@ pub struct NNPSMutParts<'a> {
 // implemented linked list neighbour search
 pub trait NNPS {
     fn get_parts_mut(&mut self) -> NNPSMutParts;
-    fn get_x(&self) -> &Array1<f32>;
-    fn get_y(&self) -> &Array1<f32>;
+    fn get_x(&self) -> &Vec<f32>;
+    fn get_y(&self) -> &Vec<f32>;
+}
+
+#[macro_export]
+macro_rules! impl_nnps{
+    ($($t:ty)*) => ($(
+        impl NNPS for $t {
+            fn get_parts_mut(&mut self) -> NNPSMutParts {
+                NNPSMutParts{
+                    len: &mut self.len,
+                    x: &mut self.x,
+                    y: &mut self.y,
+                    h: &mut self.h,
+                    id: &mut self.id,
+                }
+            }
+            fn get_x(&self) ->  & Vec<f32>{
+                &self.x
+            }
+            fn get_y(&self) ->  & Vec<f32>{
+                &self.y
+            }
+        }
+    )*)
 }
 
 #[derive(Debug, Clone)]
@@ -98,8 +120,7 @@ impl LinkedListGrid {
         }
 
         // create cells of required size
-        let mut cells: Vec<CellGrid> =
-            vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
+        let mut cells: Vec<CellGrid> = vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
 
         for j in 0..world.len() {
             let entity = world[j].get_parts_mut();
@@ -127,7 +148,6 @@ impl LinkedListGrid {
         grid
     }
 }
-
 
 pub fn get_neighbours_ll<'a>(
     pos: [f32; 3],

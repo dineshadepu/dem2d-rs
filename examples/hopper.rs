@@ -1,25 +1,22 @@
-#![allow(dead_code)]
-#![allow(unused_imports)]
-
+#[macro_use]
 extern crate dem;
-extern crate ndarray;
 
-use dem::DemDiscrete;
 use dem::contact_search::LinkedListGrid;
-use dem::dem::{body_force_dem, make_forces_zero, spring_force};
-use dem::geometry::dam_break_2d_geometry;
-use dem::integrator::integrate;
+use dem::geometry::{grid_2d, hopper_2d};
+use dem::integrate::{integrate_initialize, integrate_stage1, integrate_stage2};
+use dem::physics::dem::DemDiscrete;
+use dem::physics::dem::equations::{body_force_dem, linear_viscoelastic_model_dem_other,
+                                   linear_viscoelastic_model_dem_self, make_forces_zero};
 use dem::save_data::{create_output_directory, dump_output};
-use ndarray::prelude::*;
 
 pub struct SimulationData {
     pub grains_spacing: f32,
     pub grains_length: f32,
     pub grains_height: f32,
-    pub tank_spacing: f32,
-    pub tank_length: f32,
-    pub tank_height: f32,
-    pub tank_layers: usize,
+    pub hopper_spacing: f32,
+    pub hopper_br: f32,
+    pub hopper_tr: f32,
+    pub hopper_height: f32,
 }
 
 impl SimulationData {
@@ -28,17 +25,19 @@ impl SimulationData {
             grains_spacing: 0.5,
             grains_length: 4.,
             grains_height: 5.,
-            tank_spacing: 0.3,
-            tank_length: 10.,
-            tank_height: 7.,
-            tank_layers: 2,
+            hopper_spacing: 0.3,
+            hopper_tr: 5.,
+            hopper_br: 3.,
+            hopper_height: 7.,
         }
     }
 }
 
-fn setup_particle_properties(part1: &mut DemDiscrete, h: f32, mass: f32) {
+fn setup_particle_properties(part1: &mut DemDiscrete, x: Vec<f32>, y: Vec<f32>, h: f32, mass: f32) {
     let m_inv = 1. / mass;
     for i in 0..part1.len {
+        part1.x[i] = x[i];
+        part1.y[i] = y[i];
         part1.h[i] = h;
         part1.rad[i] = h;
         part1.m[i] = mass;
@@ -49,48 +48,103 @@ fn setup_particle_properties(part1: &mut DemDiscrete, h: f32, mass: f32) {
 fn main() {
     let sim_data = SimulationData::new();
 
-    let (xg, yg, xt, yt) = dam_break_2d_geometry(
+    let (xh, yh) = hopper_2d(
+        sim_data.hopper_br,
+        sim_data.hopper_tr,
+        sim_data.hopper_height,
+        sim_data.hopper_spacing,
+    );
+
+    let (xg, yg) = grid_2d(
         sim_data.grains_length,
         sim_data.grains_height,
         sim_data.grains_spacing,
-        sim_data.tank_length,
-        sim_data.tank_height,
-        sim_data.tank_spacing,
-        sim_data.tank_layers,
     );
+    let mut grains = DemDiscrete::new(xg.len(), 0, "grains".to_string());
+    let mut hopper = DemDiscrete::new(xh.len(), 1, "hopper".to_string());
 
-    let mut grains = DemDiscrete::new_x_y(arr1(&xg), arr1(&yg), 0, "grains".to_string());
-    let mut tank = DemDiscrete::new_x_y(arr1(&xt), arr1(&yt), 1, "tank".to_string());
     setup_particle_properties(
         &mut grains,
-        sim_data.grains_spacing/2.,
+        xg,
+        yg,
+        sim_data.grains_spacing / 2.,
         1000. * sim_data.grains_spacing.powf(2.),
     );
     setup_particle_properties(
-        &mut tank,
-        sim_data.tank_spacing/2.,
-        1000. * sim_data.tank_spacing.powf(2.),
+        &mut hopper,
+        xh,
+        yh,
+        sim_data.hopper_spacing / 2.,
+        1000. * sim_data.hopper_spacing.powf(2.),
     );
 
-    let dt = 1e-5;
-    let tf = 2.;
+    // move the grains left
+    for i in 0..grains.len{
+        grains.x[i] -= 0.4;
+        grains.y[i] += 0.5;
+    }
+
+    let dt = 1e-3;
+    let dim = 2;
+    let tf = 1000. * dt;
     let mut time_step_number = 0;
     let mut t = 0.;
     let scale = 2.;
+    let stage1 = 1;
+    let stage2 = 2;
 
-
-    create_output_directory();
+    let dir_name = create_directory_return_name![];
 
     while t < tf {
-        let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut tank], scale);
+        let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut hopper], scale);
+        // initialize the components
+        integrate_initialize(&mut vec![&mut grains], dt);
+
+        // Compute the forces
         make_forces_zero(&mut grains);
         body_force_dem(&mut grains, 0., -9.81);
-        spring_force(&mut vec![&mut grains, &mut tank], 0, vec![0, 1], 1e7, &grid);
-        integrate(&mut grains, dt);
+        linear_viscoelastic_model_dem_other(
+            &mut grains,
+            &mut hopper,
+            1e7,
+            0.0,
+            dt,
+            stage1,
+            &grid,
+            dim,
+        );
+        linear_viscoelastic_model_dem_self(&mut grains, 1e7, 0.0, dt, stage1, &grid, dim);
+
+        // Execulte stage 1
+        integrate_stage1(&mut vec![&mut grains], dt);
+
+        // Compute the forces
+        make_forces_zero(&mut grains);
+        body_force_dem(&mut grains, 0., -9.81);
+        linear_viscoelastic_model_dem_other(
+            &mut grains,
+            &mut hopper,
+            1e7,
+            0.0,
+            dt,
+            stage2,
+            &grid,
+            dim,
+        );
+        linear_viscoelastic_model_dem_self(&mut grains, 1e7, 0.0, dt, stage2, &grid, dim);
+
+        // Execulte stage 2
+        integrate_stage2(&mut vec![&mut grains], dt);
+
+        // increase the time
         t = t + dt;
-        if time_step_number % 100 == 0{
+        if time_step_number % 100 == 0 {
             println!("{:?}", time_step_number);
-            dump_output(&mut vec![&mut grains, &mut tank], time_step_number);
+            dump_output(
+                &mut vec![&mut grains, &mut hopper],
+                time_step_number,
+                &dir_name,
+            );
         }
         time_step_number += 1;
     }
