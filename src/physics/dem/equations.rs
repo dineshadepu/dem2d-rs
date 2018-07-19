@@ -360,6 +360,8 @@ pub fn linear_viscoelastic_model_dem_other<T, U>(
                             }
                         };
                     }
+                    dest.fx[i] += f[0];
+                    dest.fy[i] += f[1];
                 }
                 // if they are not overlapping, remove the particle j of srce id
                 // from history of particle i
@@ -729,6 +731,9 @@ pub fn linear_viscoelastic_model_dem_self<T>(
                                 }
                             };
                         }
+
+                        dest.fx[i] += f[0];
+                        dest.fy[i] += f[1];
                     }
                     // if they are not overlapping, remove the particle j of dest id
                     // from history of particle i

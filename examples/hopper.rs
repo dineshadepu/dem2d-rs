@@ -22,12 +22,12 @@ pub struct SimulationData {
 impl SimulationData {
     fn new() -> Self {
         SimulationData {
-            grains_spacing: 0.5,
+            grains_spacing: 0.3,
             grains_length: 4.,
             grains_height: 5.,
             hopper_spacing: 0.3,
             hopper_tr: 5.,
-            hopper_br: 3.,
+            hopper_br: 1.,
             hopper_height: 7.,
         }
     }
@@ -80,13 +80,13 @@ fn main() {
 
     // move the grains left
     for i in 0..grains.len{
-        grains.x[i] -= 0.4;
-        grains.y[i] += 0.5;
+        grains.x[i] -= 2.;
+        grains.y[i] += 3.;
     }
 
-    let dt = 1e-3;
+    let dt = 1e-4;
     let dim = 2;
-    let tf = 1000. * dt;
+    let tf = 2.;
     let mut time_step_number = 0;
     let mut t = 0.;
     let scale = 2.;
@@ -94,6 +94,7 @@ fn main() {
     let stage2 = 2;
 
     let dir_name = create_directory_return_name![];
+    let pfreq = 100;
 
     while t < tf {
         let grid = LinkedListGrid::new(&mut vec![&mut grains, &mut hopper], scale);
@@ -138,7 +139,7 @@ fn main() {
 
         // increase the time
         t = t + dt;
-        if time_step_number % 100 == 0 {
+        if time_step_number % pfreq == 0 {
             println!("{:?}", time_step_number);
             dump_output(
                 &mut vec![&mut grains, &mut hopper],
