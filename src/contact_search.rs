@@ -11,7 +11,7 @@ pub struct NNPSMutParts<'a> {
 // trait which has to be implemented by every struct which need to be
 // implemented linked list neighbour search
 pub trait NNPS {
-    fn get_parts_mut(&mut self) -> NNPSMutParts;
+    fn get_parts_mut_nnps(&mut self) -> NNPSMutParts;
     fn get_x(&self) -> &Vec<f32>;
     fn get_y(&self) -> &Vec<f32>;
 }
@@ -20,7 +20,7 @@ pub trait NNPS {
 macro_rules! impl_nnps{
     ($($t:ty)*) => ($(
         impl NNPS for $t {
-            fn get_parts_mut(&mut self) -> NNPSMutParts {
+            fn get_parts_mut_nnps(&mut self) -> NNPSMutParts {
                 NNPSMutParts{
                     len: &mut self.len,
                     x: &mut self.x,
@@ -80,7 +80,7 @@ impl LinkedListGrid {
         let mut size = 0.;
 
         for i in 0..world.len() {
-            let ent_i = &world[i].get_parts_mut();
+            let ent_i = &world[i].get_parts_mut_nnps();
             for i in 0..ent_i.x.len() {
                 if x_min > ent_i.x[i] {
                     x_min = ent_i.x[i];
@@ -115,7 +115,7 @@ impl LinkedListGrid {
         // get all keys of the entities
         let mut keys: Vec<usize> = vec![];
         for i in 0..world.len() {
-            let ent_i = world[i].get_parts_mut();
+            let ent_i = world[i].get_parts_mut_nnps();
             keys.push(*ent_i.id);
         }
 
@@ -123,7 +123,7 @@ impl LinkedListGrid {
         let mut cells: Vec<CellGrid> = vec![CellGrid::new(&keys); no_x_cells * no_y_cells];
 
         for j in 0..world.len() {
-            let entity = world[j].get_parts_mut();
+            let entity = world[j].get_parts_mut_nnps();
             let id = entity.id;
             for i in 0..entity.x.len() {
                 // find the index

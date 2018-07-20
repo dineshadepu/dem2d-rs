@@ -1,13 +1,13 @@
 #[macro_use]
-extern crate dem;
+extern crate dem2d;
 
-use dem::contact_search::LinkedListGrid;
-use dem::geometry::{grid_2d, hopper_2d};
-use dem::integrate::{integrate_initialize, integrate_stage1, integrate_stage2};
-use dem::physics::dem::DemDiscrete;
-use dem::physics::dem::equations::{body_force_dem, linear_viscoelastic_model_dem_other,
-                                   linear_viscoelastic_model_dem_self, make_forces_zero};
-use dem::save_data::{create_output_directory, dump_output};
+use dem2d::contact_search::LinkedListGrid;
+use dem2d::geometry::{grid_2d, hopper_2d};
+use dem2d::integrate::{integrate_initialize, integrate_stage1, integrate_stage2};
+use dem2d::physics::dem::DemDiscrete;
+use dem2d::physics::dem::equations::{body_force_dem, linear_viscoelastic_model_dem_other,
+                                     linear_viscoelastic_model_dem_self, make_forces_zero};
+use dem2d::save_data::{create_output_directory, dump_output};
 
 pub struct SimulationData {
     pub grains_spacing: f32,

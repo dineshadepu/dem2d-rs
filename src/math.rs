@@ -17,9 +17,9 @@ pub fn vec_compare(va: &Vector3<f32>, vb: &Vector3<f32>) -> bool {
 /// # Examples
 
 /// ```
-/// # extern crate granules;
+/// # extern crate dem2d;
 /// # extern crate cgmath;
-/// # use granules::math::{unit_vector_from_dx, vec_compare};
+/// # use dem2d::math::{unit_vector_from_dx, vec_compare};
 /// # use cgmath::Vector3;
 /// let vec1: Vec<f32> = vec![1., 4., 6.];
 /// let vec2: Vec<f32> = vec![2., 5., 9.];
@@ -45,9 +45,9 @@ pub fn unit_vector_from_dx(dx: f32, dy: f32, dz: f32, magn: f32) -> Vector3<f32>
 /// # Examples
 
 /// ```
-/// # extern crate granules;
+/// # extern crate dem2d;
 /// # extern crate cgmath;
-/// # use granules::math::{unit_vector_from_dx, vec_compare,
+/// # use dem2d::math::{unit_vector_from_dx, vec_compare,
 /// #                      unit_vector_from_vector};
 /// # use cgmath::Vector3;
 /// let vec1: Vec<f32> = vec![1., 4., 6.];
@@ -73,4 +73,11 @@ pub fn unit_vector_from_point(from: Vector3<f32>, to: Vector3<f32>) -> Vector3<f
     let distance = (dx.powf(2.) + dy.powf(2.) + dz.powf(2.)).sqrt();
 
     unit_vector_from_dx(dx, dy, dz, distance)
+}
+
+pub fn distance(from: &Vector3<f32>, to: &Vector3<f32>) -> f32{
+    let dx = to.x - from.x;
+    let dy = to.y - from.y;
+    let dz = to.z - from.z;
+    (dx.powf(2.) + dy.powf(2.) + dz.powf(2.)).sqrt()
 }

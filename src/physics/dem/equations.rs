@@ -43,11 +43,11 @@ pub fn body_force_dem(entity: &mut DemDiscrete, gx: f32, gy: f32) {
 
 /// # Example
 /// ```
-/// # extern crate granules;
+/// # extern crate dem2d;
 /// # extern crate cgmath;
 /// # use cgmath::Vector3;
-/// # use granules::physics::dem::equations::relative_velocity;
-/// # use granules::math::{vec_compare};
+/// # use dem2d::physics::dem::equations::relative_velocity;
+/// # use dem2d::math::{vec_compare};
 /// let vi = Vector3::new(1., 0., 0.); // linear velocity of particle i
 /// let vj = Vector3::new(-1., 0., 0.); // linear velocity of particle j
 /// let ang_i = Vector3::new(0., 0., 1.); // angular velocity of particle i

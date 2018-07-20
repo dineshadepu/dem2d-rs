@@ -1,15 +1,27 @@
 #[macro_use]
 pub mod equations;
+mod tests;
 
 // local imports
 use contact_search::{NNPSMutParts, NNPS};
 use std::collections::HashMap;
 
 // external crate imports
-use cm::{Vector3, Zero};
-use ndarray::prelude::*;
+use cm::{Vector3};
 
-pub struct DemDiscrete {
+#[derive(Clone, Debug)]
+pub struct Bond {
+    tang_overlap: Vector3<f32>,
+}
+
+impl Bond {
+    pub fn new() -> Self {
+        Bond {
+            tang_overlap: Vector3::new(0., 0., 0.),
+        }
+    }
+}
+pub struct DemBonded {
     pub len: usize,
     pub m: Vec<f32>,
     pub x: Vec<f32>,
@@ -32,13 +44,13 @@ pub struct DemDiscrete {
     pub tauz: Vec<f32>,
     pub id: usize,
     pub name: String,
-    pub tang_history: Vec<HashMap<usize, HashMap<usize, Vector3<f32>>>>,
-    pub tang_history0: Vec<HashMap<usize, HashMap<usize, Vector3<f32>>>>,
+    pub bonds: Vec<HashMap<usize, Bond>>,
+    pub bonds0: Vec<HashMap<usize, Bond>>,
 }
 
-impl DemDiscrete {
+impl DemBonded {
     pub fn new(len: usize, id: usize, name: String) -> Self {
-        DemDiscrete {
+        DemBonded {
             len,
             name,
             id,
@@ -61,13 +73,13 @@ impl DemDiscrete {
             fx: vec![0.; len],
             fy: vec![0.; len],
             tauz: vec![0.; len],
-            tang_history: vec![HashMap::new(); len],
-            tang_history0: vec![HashMap::new(); len],
+            bonds: vec![HashMap::new(); len],
+            bonds0: vec![HashMap::new(); len],
         }
     }
 }
 
-pub struct DemDiscreteDstStrkt<'a> {
+pub struct DemBondedDstStrkt<'a> {
     pub len: &'a mut usize,
     pub m: &'a mut Vec<f32>,
     pub x: &'a mut Vec<f32>,
@@ -85,11 +97,11 @@ pub struct DemDiscreteDstStrkt<'a> {
     pub tauz: &'a mut Vec<f32>,
     pub id: &'a mut usize,
     pub name: &'a mut String,
-    pub tang_history: &'a mut Vec<HashMap<usize, HashMap<usize, Vector3<f32>>>>,
-    pub tang_history0: &'a mut Vec<HashMap<usize, HashMap<usize, Vector3<f32>>>>,
+    pub bonds: &'a mut Vec<HashMap<usize, Bond>>,
+    pub bonds0: &'a mut Vec<HashMap<usize, Bond>>,
 }
 
-pub struct DemDiscreteSrcStrkt<'a> {
+pub struct DemBondedSrcStrkt<'a> {
     pub m: &'a mut Vec<f32>,
     pub x: &'a mut Vec<f32>,
     pub y: &'a mut Vec<f32>,
@@ -105,20 +117,20 @@ pub struct DemDiscreteSrcStrkt<'a> {
     pub name: &'a mut String,
 }
 
-pub trait DemDiscreteDstTrait: NNPS {
-    fn get_parts_mut(&mut self) -> DemDiscreteDstStrkt;
+pub trait DemBondedDstTrait :NNPS{
+    fn get_parts_mut(&mut self) -> DemBondedDstStrkt;
 }
 
-pub trait DemDiscreteSrcTrait: NNPS {
-    fn get_parts_mut(&mut self) -> DemDiscreteSrcStrkt;
+pub trait DemBondedSrcTrait : NNPS{
+    fn get_parts_mut(&mut self) -> DemBondedSrcStrkt;
 }
 
 #[macro_export]
-macro_rules! impl_DemDiscreteDstTrait{
+macro_rules! impl_DemBondedDstTrait{
     ($($t:ty)*) => ($(
-        impl DemDiscreteDstTrait for $t {
-            fn get_parts_mut(&mut self) -> DemDiscreteDstStrkt {
-                DemDiscreteDstStrkt{
+        impl DemBondedDstTrait for $t {
+            fn get_parts_mut(&mut self) -> DemBondedDstStrkt {
+                DemBondedDstStrkt{
                     len: &mut self.len,
                     m: &mut self.m,
                     x: &mut self.x,
@@ -136,8 +148,8 @@ macro_rules! impl_DemDiscreteDstTrait{
                     tauz: &mut self.tauz,
                     id: &mut self.id,
                     name: &mut self.name,
-                    tang_history: &mut self.tang_history,
-                    tang_history0: &mut self.tang_history0,
+                    bonds: &mut self.bonds,
+                    bonds0: &mut self.bonds0,
                 }
             }
         }
@@ -145,11 +157,11 @@ macro_rules! impl_DemDiscreteDstTrait{
 }
 
 #[macro_export]
-macro_rules! impl_DemDiscreteSrcTrait{
+macro_rules! impl_DemBondedSrcTrait{
     ($($t:ty)*) => ($(
-        impl DemDiscreteSrcTrait for $t {
-            fn get_parts_mut(&mut self) -> DemDiscreteSrcStrkt {
-                DemDiscreteSrcStrkt{
+        impl DemBondedSrcTrait for $t {
+            fn get_parts_mut(&mut self) -> DemBondedSrcStrkt {
+                DemBondedSrcStrkt{
                     m: &mut self.m,
                     x: &mut self.x,
                     y: &mut self.y,
@@ -169,6 +181,6 @@ macro_rules! impl_DemDiscreteSrcTrait{
     )*)
 }
 
-impl_nnps![DemDiscrete];
-impl_DemDiscreteDstTrait![DemDiscrete];
-impl_DemDiscreteSrcTrait![DemDiscrete];
+impl_nnps![DemBonded];
+impl_DemBondedDstTrait![DemBonded];
+impl_DemBondedSrcTrait![DemBonded];

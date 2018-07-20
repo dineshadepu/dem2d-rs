@@ -1,5 +1,5 @@
 [package]
-name = "dem-rs"
+name = "dem2d-rs"
 version = "0.1.0"
 authors = ["dineshadepu <adepu.dinesh.a@gmail.com>"]
 license = "MIT"
@@ -15,5 +15,5 @@ rulinalg="0.4.2"
 cgmath="0.16"
 
 [lib]
-name = "dem"
+name = "dem2d"
 path = "src/lib.rs"
